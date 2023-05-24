@@ -1,13 +1,16 @@
 """
 Implementation of Hobbs' algorithm for pronoun resolution.
 Chris Ward, 2014
+
+Adjusted for the newer versions of python(3.6+).
+Ishan Pandey, 2023
 """
 
 import sys
 import nltk
 from nltk.corpus import names
 from nltk import Tree
-import Queue
+import queue
 
 
 # Labels for nominal heads
@@ -75,14 +78,14 @@ def bft(tree):
         lst: a list of tree nodes in left-to-right level-order
     """
     lst = []
-    queue = Queue.Queue()
-    queue.put(tree)
-    while not queue.empty():
-        node = queue.get()
+    queue_var = queue.Queue()
+    queue_var.put(tree)
+    while not queue_var.empty():
+        node = queue_var.get()
         lst.append(node)
         for child in node:
             if isinstance(child, nltk.Tree):
-                queue.put(child)
+                queue_var.put(child)
     return lst
 
 def count_np_nodes(tree):
@@ -203,16 +206,16 @@ def traverse_tree(tree, pro):
         pro: the pronoun being resolved (string)
     """
     # Initialize a queue and enqueue the root of the tree
-    queue = Queue.Queue()
-    queue.put(tree)
-    while not queue.empty():
-        node = queue.get()
+    queue_var = queue.Queue()
+    queue_var.put(tree)
+    while not queue_var.empty():
+        node = queue_var.get()
         # if the node is an NP, return it as a potential antecedent
         if "NP" in node.label() and match(tree, get_pos(tree,node), pro):
             return tree, get_pos(tree, node)
         for child in node:
             if isinstance(child, nltk.Tree):
-                queue.put(child)
+                queue_var.put(child)
     # if no antecedent is found, return None
     return None, None
 
@@ -449,34 +452,34 @@ def demo():
     tree6 = Tree.fromstring('(S (NP (NNP John) ) (VP (VBD said) (SBAR (-NONE- 0) \
         (S (NP (NNP Mary) ) (VP (VBD likes) (NP (PRP herself) ) ) ) ) ) )')
 
-    print "Sentence 1:"
-    print tree1
+    print("Sentence 1:")
+    print(tree1)
     tree, pos = hobbs([tree1], (1,1,1,0,0))
-    print "Proposed antecedent for 'he':", tree[pos], '\n'
+    print("Proposed antecedent for 'he':", tree[pos], '\n')
 
-    print "Sentence 2:"
-    print tree2
+    print("Sentence 2:")
+    print(tree2)
     tree, pos = hobbs([tree2], (1,1,1,1,1,0))
-    print "Proposed antecedent for 'him':", tree[pos], '\n'
+    print("Proposed antecedent for 'him':", tree[pos], '\n')
 
-    print "Sentence 3:"
-    print tree3
-    print "Sentence 4:"
-    print tree4
+    print("Sentence 3:")
+    print(tree3)
+    print("Sentence 4:")
+    print(tree4)
     tree, pos = hobbs([tree3,tree4], (1,1,0))
-    print "Proposed antecedent for 'it':", tree[pos]
+    print("Proposed antecedent for 'it':", tree[pos])
     tree, pos = hobbs([tree3,tree4], (0,0))
-    print "Proposed antecedent for 'he':", tree[pos], '\n'
+    print("Proposed antecedent for 'he':", tree[pos], '\n')
 
-    print "Sentence 5:"
-    print tree5
+    print("Sentence 5:")
+    print(tree5)
     tree, pos = hobbs([tree5], (1,2,1,1,0,0))
-    print "Proposed antecedent for 'he':", tree[pos], '\n'
+    print("Proposed antecedent for 'he':", tree[pos], '\n')
 
-    print "Sentence 6:"
-    print tree6
+    print("Sentence 6:")
+    print(tree6)
     tree, pos = resolve_reflexive([tree6], (1,1,1,1,1,0))
-    print "Proposed antecedent for 'herself':", tree[pos], '\n'
+    print("Proposed antecedent for 'herself':", tree[pos], '\n')
 
 
 def main(argv):
@@ -484,7 +487,7 @@ def main(argv):
         demo()
     else:
         if len(sys.argv) > 3 or len(sys.argv) < 2:
-            print "Enter the file and the pronoun to resolve."
+            print("Enter the file and the pronoun to resolve.")
         elif len(sys.argv) == 3:
             p = ["He", "he", "Him", "him", "She", "she", "Her",
                 "her", "It", "it", "They", "they"]
@@ -500,13 +503,13 @@ def main(argv):
             if pro in p:
                 tree, pos = hobbs(trees, pos)
                 for t in trees:
-                    print t, '\n'
-                print "Proposed antecedent for '"+pro+"':", tree[pos]
+                    print(t, '\n')
+                print("Proposed antecedent for '"+pro+"':", tree[pos])
             elif pro in r:
                 tree, pos = resolve_reflexive(trees, pos)
                 for t in trees:
-                    print t, '\n'
-                print "Proposed antecedent for '"+pro+"':", tree[pos]
+                    print(t, '\n')
+                print("Proposed antecedent for '"+pro+"':", tree[pos])
 
 if __name__ == "__main__":
     main(sys.argv)
