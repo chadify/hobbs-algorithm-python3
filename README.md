@@ -1,4 +1,6 @@
 hobbs.py
+
+Made compatible for the newer versions of python(3.6+).
 ________
 
 Enter `python hobbs.py demo` to see a demo.
